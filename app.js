@@ -17,7 +17,6 @@ app.use('/static', express.static('static'));
 app.use(bodyParser.json());
 
 
-
 app.get('/', function (req, res) {
     res.sendFile(__dirname + "/static/index.html");
 });
@@ -29,11 +28,7 @@ app.get('/api/todos', async (req, res) => {
 
 app.post('/api/todos', async (req, res) => {
     let title = req.body.title;
-    let id = await Todo.find().then((val => {
-        return val.length;
-    }));
-    let todo = new Todo({title: title, id: id});
-
+    let todo = new Todo({title: title});
     todo.save().then((todo) => {
         return res.json(todo);
     });
@@ -45,21 +40,21 @@ app.put('/api/todos/:id', async (req, res) => {
 
     if (req.body.completed) {
         await Todo.find({
-            id: id
+            _id: id
         }).update({completed: true});
     }
 
-    let todo = await Todo.find({
-        id: id
-    }).update({title: title});
-
-    return res.json(todo);
+    await Todo.find({
+        _id: id
+    }).update({title: title}).then((todo) => {
+        return res.json(todo);
+    });
 });
 
 app.delete('/api/todos/:id', async (req, res) => {
     let id = req.params.id;
     let todo = await Todo.find({
-        id: id
+        _id: id
     }).remove();
 
     return res.send(todo);
