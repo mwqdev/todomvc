@@ -42,13 +42,13 @@ app.put('/api/todos/:id', async (req, res) => {
         await Todo.find({
             _id: id
         }).update({completed: true});
+    } else {
+        await Todo.find({
+            _id: id
+        }).update({title: title}).then((todo) => {
+            return res.json(todo);
+        });
     }
-
-    await Todo.find({
-        _id: id
-    }).update({title: title}).then((todo) => {
-        return res.json(todo);
-    });
 });
 
 app.delete('/api/todos/:id', async (req, res) => {
